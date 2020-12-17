@@ -1,5 +1,5 @@
 # Импортируем необходимые компоненты
-from  telegram import  ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Updater,  CommandHandler, MessageHandler, Filters
 from settings import TG_TOKEN, TG_API_URL
 from bs4 import BeautifulSoup
@@ -8,9 +8,8 @@ import requests
 # Внутри функции будет описана логика при ее вызове
 def sms(bot, update):
     print('Кто-то отправил команду /start. Что мне делать?') # вывод сообщения в консоль при отправки команды /start
-    my_keyboard = ReplyKeyboardMarkup([['Анекдот'], ['Начать']], resize_keyboard=True) # добавляем кнопку
     bot.message.reply_text('Здравствуйте, {}! \nПоговорите со мной!'
-                           .format(bot.message.chat.first_name), reply_markup=my_keyboard)
+                           .format(bot.message.chat.first_name), reply_markup=get_keyboard())
 
 def get_anecdote(bot, update):
     receive = requests.get('http://anekdotme.ru/random') # отправляем запрос к странице
@@ -27,6 +26,23 @@ def parrot(bot, update):
     print(bot.message.text) # печатаем на экран
     bot.message.reply_text(bot.message.text) # отправляем обратно текст который пользователь послал
 
+# Функция печатает и отвечает на полученный контакт
+def get_contact(bot, update):
+    print(bot.message.contact)
+    bot.message.reply_text('{}, мы получили ваш номер телефона!'.format(bot.message.chat.first_name))
+
+# Функция печатает и отвечает на полученные геоданные
+def get_location(bot, update):
+    print(bot.message.location)
+    bot.message.reply_text('{}, мы получили ваше местоположение!'.format(bot.message.chat.first_name))
+
+# Функция создаёт клавиатуру и ее разметку
+def get_keyboard():
+    contact_button = KeyboardButton('Отправить контакты', request_contact=True)
+    location_button = KeyboardButton('Отправить геопозицию', request_location=True)
+    my_keyboard = ReplyKeyboardMarkup([['Анекдот', 'Начать'],[contact_button, location_button]], resize_keyboard=True)
+    return  my_keyboard
+
 # Создадим (объявляем) функцию main, которая соединяется с платформой Telegram
 def main():
     # тело функции, описываем функцию
@@ -36,6 +52,8 @@ def main():
     my_bot.dispatcher.add_handler(CommandHandler('start', sms)) # обработчик команды start
     my_bot.dispatcher.add_handler(MessageHandler(Filters.regex('Начать'), sms)) # обрабатываем текст кнопки
     my_bot.dispatcher.add_handler(MessageHandler(Filters.regex('Анекдот'), get_anecdote)) # обрабатываем текст кнопки
+    my_bot.dispatcher.add_handler(MessageHandler(Filters.contact, get_contact)) # обработчик полученного номера телефона
+    my_bot.dispatcher.add_handler(MessageHandler(Filters.location, get_location)) # обработчик полученного местоположения
     my_bot.dispatcher.add_handler(MessageHandler(Filters.text, parrot)) # обработчик текстового сообщения
     my_bot.start_polling() # проверяет о наличии сообщений с платформы Telegram
     my_bot.idle() # бот будет работать пока его не остановят
