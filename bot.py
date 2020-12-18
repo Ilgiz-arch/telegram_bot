@@ -15,16 +15,6 @@ def main():
     my_bot.dispatcher.add_handler(MessageHandler(Filters.regex('Анекдот'), get_anecdote)) # обрабатываем текст кнопки
     my_bot.dispatcher.add_handler(MessageHandler(Filters.contact, get_contact)) # обработчик полученного контакта
     my_bot.dispatcher.add_handler(MessageHandler(Filters.location, get_location)) # обработчик полученной геопозиции
-    my_bot.dispatcher.add_handler(ConversationHandler(entry_points=[MessageHandler(Filters.regex('Заполнить анкету'), anketa_start)],
-                                                      states={'user_name':[MessageHandler(Filters.text, anketa_get_name)],
-                                                              'user_age':[MessageHandler(Filters.text, anketa_get_age)],
-                                                              'evaluation': [MessageHandler(Filters.regex('1|2|3|4|5'), anketa_get_evaluation)],
-                                                              'comment':[MessageHandler(Filters.regex('Пропустить'), anketa_exit_comment()),
-                                                                         MessageHandler(Filters.text, anketa_comment())]
-                                                              },
-                                                      fallbacks=[MessageHandler(Filters.text | Filters.video | Filters.photo | Filters.document, dontknow)]
-                                                      )
-                                  )
     my_bot.dispatcher.add_handler(MessageHandler(Filters.text, parrot)) # обработчик текстового сообщения
     my_bot.start_polling() # проверяет о наличии сообщений с платформы Telegram
     my_bot.idle() # бот будет работать пока его не остановят
