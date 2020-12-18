@@ -11,6 +11,7 @@ def main():
     my_bot = Updater(TG_TOKEN , TG_API_URL, use_context=True)
 
     my_bot.dispatcher.add_handler(CommandHandler('start', sms)) # обработчик команды start
+    my_bot.dispatcher.add_handler(MessageHandler(Filters.regex('Картинки'), send_meme))
     my_bot.dispatcher.add_handler(MessageHandler(Filters.regex('Начать'), sms)) # обрабатываем текст кнопки
     my_bot.dispatcher.add_handler(MessageHandler(Filters.regex('Анекдот'), get_anecdote)) # обрабатываем текст кнопки
     my_bot.dispatcher.add_handler(MessageHandler(Filters.contact, get_contact)) # обработчик полученного контакта

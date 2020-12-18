@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
-from  mongodb import  mdb, search_or_save_user
+from  mongodb import  mdb, search_or_save_user, save_file_id, save_picture_name
 from utility import get_keyboard
+from telegram import  InlineKeyboardButton,InlineKeyboardMarkup
+from  glob import  glob
+from  random import choice
 import requests
 
 # Функция sms() будет вызвана пользователем при отправке команды start
@@ -11,6 +14,18 @@ def sms(bot, update):
     print('Кто-то отправил команду /start. Что мне делать?') # вывод сообщения в консоль при отправки команды /start
     bot.message.reply_text('Здравствуйте, {}! \nПоговорите со мной!'
                            .format(bot.message.chat.first_name), reply_markup=get_keyboard())
+
+# Функция отправляет случайную картинку
+def send_meme(bot, update):
+    lists = glob('images/*') # создаем список из названий картинок
+    picture = choice((lists)) # берем из списка одну картинку
+    image = save_picture_name(mdb, picture)  # получаем из базы данных словарь
+
+    msg = update.bot.send_photo(
+        chat_id=bot.message.chat.id,
+        photo=open(picture, 'rb'),
+        )  # отправляем картинку и inline клавиатуру
+    save_file_id(mdb, picture, msg)  #
 
 def get_anecdote(bot, update):
     receive = requests.get('http://anekdotme.ru/random') # отправляем запрос к странице
