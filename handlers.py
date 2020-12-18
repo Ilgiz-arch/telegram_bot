@@ -1,12 +1,13 @@
 from bs4 import BeautifulSoup
-from telegram import ReplyKeyboardRemove, ReplyKeyboardMarkup, ParseMode
-from telegram.ext import  ConversationHandler
+from  mongodb import  mdb, search_or_save_user
 from utility import get_keyboard
 import requests
 
 # Функция sms() будет вызвана пользователем при отправке команды start
 # Внутри функции будет описана логика при ее вызове
 def sms(bot, update):
+    user = search_or_save_user(mdb, bot.effective_user, bot.message) # получаем данные из базы данных
+    print(user)
     print('Кто-то отправил команду /start. Что мне делать?') # вывод сообщения в консоль при отправки команды /start
     bot.message.reply_text('Здравствуйте, {}! \nПоговорите со мной!'
                            .format(bot.message.chat.first_name), reply_markup=get_keyboard())
